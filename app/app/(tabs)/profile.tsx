@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useFocusEffect } from "expo-router";
 
 import {
@@ -27,7 +27,6 @@ const API_URL = "http://127.0.0.1:8000";
 const { width } = Dimensions.get("window");
 const TILE_SIZE = (width - 3) / 3;
 
-// ─── TYPES ─────────────────────────────────────────────
 type PostImage = {
   id: string;
   image_url: string;
@@ -50,7 +49,6 @@ type User = {
   university?: string;
 };
 
-// ─── TOKEN DECODER ─────────────────────────────────────
 function decodeToken(token: string) {
   try {
     return JSON.parse(atob(token.split(".")[1]));
@@ -60,10 +58,9 @@ function decodeToken(token: string) {
   }
 }
 
-// ─── MAIN SCREEN ───────────────────────────────────────
 export default function ProfileScreen({ navigation }: any) {
   const router = useRouter();
-  const { theme, mode } = useTheme(); // ✅ ADDED
+  const { theme, mode } = useTheme();
 
   const [user, setUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -75,10 +72,7 @@ export default function ProfileScreen({ navigation }: any) {
   const fetchData = useCallback(async () => {
     try {
       const token = await AsyncStorage.getItem("access_token");
-      if (!token) {
-        navigation.replace("Login");
-        return;
-      }
+      if (!token) return; // ✅ don't redirect to login
 
       const payload = decodeToken(token);
       const userId = payload?.sub;
@@ -124,24 +118,41 @@ export default function ProfileScreen({ navigation }: any) {
     const firstImage = post.images?.[0]?.image_url;
 
     return (
-      <TouchableOpacity
-        style={[styles.tile, { backgroundColor: theme.card }]} // ✅ theme
-        activeOpacity={0.8}
-      >
-        {firstImage ? (
-          <Image
-            source={{ uri: `${API_URL}${firstImage}` }}
-            style={styles.tileImage}
-            resizeMode="cover"
-          />
-        ) : (
-          <View style={styles.tileFallback}>
-            <Text numberOfLines={4} style={{ color: theme.text }}>
-              {post.content || ""}
-            </Text>
-          </View>
-        )}
-      </TouchableOpacity>
+      <View style={[styles.tile, { backgroundColor: theme.card }]}>
+        <TouchableOpacity style={{ flex: 1 }} activeOpacity={0.8}>
+          {firstImage ? (
+            <Image
+              source={{ uri: `${API_URL}${firstImage}` }}
+              style={styles.tileImage}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={styles.tileFallback}>
+              <Text numberOfLines={4} style={{ color: theme.text }}>
+                {post.content || ""}
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
+
+        {/* ── Options button ── */}
+        <TouchableOpacity
+          style={styles.tileOptionsBtn}
+          activeOpacity={0.7}
+          onPress={() =>
+            router.push({
+              pathname: "/(tabs)/edit-post",
+              params: {
+                postId: post.id,
+                currentContent: post.content ?? "",
+                currentImage: post.images?.[0]?.image_url ?? "",
+              },
+            })
+          }
+        >
+          <Ionicons name="ellipsis-horizontal" size={18} color="#fff" />
+        </TouchableOpacity>
+      </View>
     );
   }
 
@@ -165,7 +176,6 @@ export default function ProfileScreen({ navigation }: any) {
 
   const ProfileHeader = () => (
     <View>
-      {/* Top Bar */}
       <View style={styles.topBar}>
         <View style={styles.topBarLeft}>
           <Ionicons name="lock-closed" size={13} color={theme.text} />
@@ -174,13 +184,11 @@ export default function ProfileScreen({ navigation }: any) {
           </Text>
           <Ionicons name="chevron-down" size={13} color={theme.text} />
         </View>
-
         <TouchableOpacity>
           <Ionicons name="menu" size={26} color={theme.text} />
         </TouchableOpacity>
       </View>
 
-      {/* Avatar */}
       <View style={styles.avatarStatsRow}>
         <View style={styles.avatarWrapper}>
           {user?.profile_pic ? (
@@ -194,7 +202,6 @@ export default function ProfileScreen({ navigation }: any) {
             </View>
           )}
         </View>
-
         <View style={styles.statsRow}>
           <StatCol count={posts.length} label="Posts" />
           <StatCol count={followers.length} label="Followers" />
@@ -202,30 +209,24 @@ export default function ProfileScreen({ navigation }: any) {
         </View>
       </View>
 
-      {/* Bio */}
       <View style={styles.bioSection}>
         {user?.full_name && (
           <Text style={[styles.fullName, { color: theme.text }]}>
             {user.full_name}
           </Text>
         )}
-
         {(user?.department || user?.university) && (
           <Text style={{ color: theme.text }}>
             {[user.department, user.university].filter(Boolean).join(" · ")}
           </Text>
         )}
-
         {user?.bio && (
           <Text style={{ color: theme.text }}>{user.bio}</Text>
         )}
       </View>
 
-      {/* Buttons */}
       <View style={styles.editBtnWrapper}>
-        <TouchableOpacity
-          style={[styles.editBtn, { borderColor: theme.card }]}
-        >
+        <TouchableOpacity style={[styles.editBtn, { borderColor: theme.card }]}>
           <Text style={{ color: theme.text }}>Edit Profile</Text>
         </TouchableOpacity>
       </View>
@@ -258,91 +259,79 @@ export default function ProfileScreen({ navigation }: any) {
   );
 }
 
-// ─── STATIC STYLES (only layout now) ───────────────────
 const styles = StyleSheet.create({
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-
   topBar: {
     flexDirection: "row",
     justifyContent: "space-between",
     padding: 16,
   },
-
   topBarLeft: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
   },
-
   topUsername: {
     fontSize: 16,
     fontWeight: "700",
     marginHorizontal: 4,
   },
-
   avatarStatsRow: {
     flexDirection: "row",
     paddingHorizontal: 16,
     marginTop: 10,
   },
-
-  avatarWrapper: {
-    marginRight: 20,
-  },
-
+  avatarWrapper: { marginRight: 20 },
   avatar: {
     width: 86,
     height: 86,
     borderRadius: 43,
   },
-
   statsRow: {
     flex: 1,
     flexDirection: "row",
     justifyContent: "space-around",
   },
-
   statCol: { alignItems: "center" },
-
   statNumber: { fontSize: 16, fontWeight: "700" },
-
   bioSection: {
     paddingHorizontal: 16,
     marginTop: 10,
   },
-
   fullName: {
     fontWeight: "600",
     marginBottom: 4,
   },
-
   editBtnWrapper: {
     paddingHorizontal: 16,
     marginTop: 12,
   },
-
   editBtn: {
     borderWidth: 1,
     borderRadius: 8,
     padding: 8,
     alignItems: "center",
   },
-
   row: { gap: 1.5 },
-
   tile: {
     width: TILE_SIZE,
     height: TILE_SIZE,
   },
-
   tileImage: {
     width: "100%",
     height: "100%",
   },
-
   tileFallback: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  tileOptionsBtn: {
+    position: "absolute",
+    bottom: 4,
+    right: 4,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    borderRadius: 12,
+    padding: 3,
   },
 });

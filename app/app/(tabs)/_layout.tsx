@@ -7,15 +7,15 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
 
 export default function TabLayout() {
-  const { theme, mode } = useTheme(); // ✅ use global theme instead of colorScheme
+  const { theme, mode } = useTheme();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: theme.tint,           // ✅ active icon color
-        tabBarInactiveTintColor: theme.subtext,       // ✅ inactive icon color
+        tabBarActiveTintColor: theme.tint,
+        tabBarInactiveTintColor: theme.subtext,
         tabBarStyle: {
-          backgroundColor: theme.card,               // ✅ tab bar background
+          backgroundColor: theme.card,
           borderTopColor: theme.background,
         },
         tabBarLabelStyle: {
@@ -67,12 +67,20 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="settings"                              // ✅ NEW settings tab
+        name="settings"
         options={{
           title: "Settings",
           tabBarIcon: ({ color }) => (
             <Ionicons name="settings-outline" size={22} color={color} />
           ),
+        }}
+      />
+
+      {/* ── Hidden screens (no tab bar entry) ── */}
+      <Tabs.Screen
+        name="edit-post"
+        options={{
+          href: null,
         }}
       />
     </Tabs>

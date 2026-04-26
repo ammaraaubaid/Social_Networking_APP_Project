@@ -17,21 +17,130 @@ import { useTheme } from "../../context/ThemeContext";
 
 const API_URL = "http://127.0.0.1:8000";
 
+// ─── POST CARD ─────────────────────────────────────────
+function PostCard({ item, theme }: { item: any; theme: any }) {
+  const [isLiked, setIsLiked] = useState(item.is_liked);
+  const [likesCount, setLikesCount] = useState(item.likes_count);
+  const [liking, setLiking] = useState(false);
+
+  const handleLike = async () => {
+    if (liking) return;
+    const token = await AsyncStorage.getItem("access_token");
+    if (!token) return;
+
+    const wasLiked = isLiked; // ✅ capture before any state change
+
+    // optimistic update
+    setIsLiked(!wasLiked);
+    setLikesCount((c: number) => wasLiked ? c - 1 : c + 1);
+    setLiking(true);
+
+    try {
+      const method = wasLiked ? "DELETE" : "POST";
+      const res = await fetch(`${API_URL}/posts/${item.id}/like`, {
+        method,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        // revert using captured value
+        setIsLiked(wasLiked);
+        setLikesCount((c: number) => wasLiked ? c + 1 : c - 1);
+      }
+    } catch (e) {
+      console.log("Like error:", e);
+      setIsLiked(wasLiked);
+      setLikesCount((c: number) => wasLiked ? c + 1 : c - 1);
+    } finally {
+      setLiking(false);
+    }
+  };
+
+  return (
+    <View style={[styles.post, { borderColor: theme.card, backgroundColor: theme.card }]}>
+      {/* HEADER ROW */}
+      <View style={styles.postHeader}>
+        {item.profile_pic ? (
+          <Image
+            source={{
+              uri: item.profile_pic.startsWith("http")
+                ? item.profile_pic
+                : `${API_URL}${item.profile_pic}`,
+            }}
+            style={styles.avatar}
+          />
+        ) : (
+          <View style={[styles.avatar, styles.avatarFallback, { backgroundColor: theme.background }]}>
+            <Ionicons name="person" size={16} color={theme.subtext} />
+          </View>
+        )}
+        <Text style={[styles.username, { color: theme.text }]}>
+          @{item.username}
+        </Text>
+      </View>
+
+      {/* CONTENT */}
+      {item.content ? (
+        <Text style={[styles.content, { color: theme.text }]}>
+          {item.content}
+        </Text>
+      ) : null}
+
+      {/* IMAGE */}
+      {item.image && (
+        <Image
+          source={{
+            uri: item.image.startsWith("http")
+              ? item.image
+              : `${API_URL}${item.image}`,
+          }}
+          style={styles.image}
+          resizeMode="cover"
+        />
+      )}
+
+      {/* FOOTER */}
+      <View style={styles.footer}>
+        <TouchableOpacity
+          style={styles.likeBtn}
+          onPress={handleLike}
+          disabled={liking}
+          activeOpacity={1}
+        >
+          <Ionicons
+            name={isLiked ? "heart" : "heart-outline"}
+            size={22}
+            color={isLiked ? "#e0245e" : theme.subtext}
+          />
+          <Text style={[styles.likeCount, { color: isLiked ? "#e0245e" : theme.subtext }]}>
+            {likesCount}
+          </Text>
+        </TouchableOpacity>
+
+        <Text style={[styles.time, { color: theme.subtext }]}>
+          {item.created_at ? new Date(item.created_at).toLocaleString() : ""}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+// ─── HOME SCREEN ───────────────────────────────────────
 export default function Home() {
   const { theme } = useTheme();
 
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [likingIds, setLikingIds] = useState<Set<string>>(new Set());
 
   const fetchFeed = async () => {
     try {
-      const token = await AsyncStorage.getItem("access_token");
       const res = await fetch(`${API_URL}/feed`);
       const data = await res.json();
 
-      // fetch like count + is_liked for each post
       const withLikes = await Promise.all(
         data.map(async (post: any) => {
           try {
@@ -68,72 +177,6 @@ export default function Home() {
     fetchFeed();
   };
 
-  const handleLike = async (postId: string, isLiked: boolean) => {
-    const token = await AsyncStorage.getItem("access_token");
-    if (!token) return;
-
-    // optimistic update
-    setPosts((prev) =>
-      prev.map((p) =>
-        p.id === postId
-          ? {
-              ...p,
-              is_liked: !isLiked,
-              likes_count: isLiked ? p.likes_count - 1 : p.likes_count + 1,
-            }
-          : p
-      )
-    );
-
-    setLikingIds((prev) => new Set(prev).add(postId));
-
-    try {
-      const method = isLiked ? "DELETE" : "POST";
-      const res = await fetch(`${API_URL}/posts/${postId}/like`, {
-        method,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!res.ok) {
-        // revert on failure
-        setPosts((prev) =>
-          prev.map((p) =>
-            p.id === postId
-              ? {
-                  ...p,
-                  is_liked: isLiked,
-                  likes_count: isLiked ? p.likes_count + 1 : p.likes_count - 1,
-                }
-              : p
-          )
-        );
-      }
-    } catch (e) {
-      console.log("Like error:", e);
-      // revert on error
-      setPosts((prev) =>
-        prev.map((p) =>
-          p.id === postId
-            ? {
-                ...p,
-                is_liked: isLiked,
-                likes_count: isLiked ? p.likes_count + 1 : p.likes_count - 1,
-              }
-            : p
-        )
-      );
-    } finally {
-      setLikingIds((prev) => {
-        const next = new Set(prev);
-        next.delete(postId);
-        return next;
-      });
-    }
-  };
-
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Text style={[styles.header, { color: theme.text }]}>Unifi Feed</Text>
@@ -151,76 +194,7 @@ export default function Home() {
               tintColor={theme.text}
             />
           }
-          renderItem={({ item }) => (
-            <View style={[styles.post, { borderColor: theme.card, backgroundColor: theme.card }]}>
-
-              {/* HEADER ROW */}
-              <View style={styles.postHeader}>
-                {item.profile_pic ? (
-                  <Image
-                    source={{
-                      uri: item.profile_pic.startsWith("http")
-                        ? item.profile_pic
-                        : `${API_URL}${item.profile_pic}`,
-                    }}
-                    style={styles.avatar}
-                  />
-                ) : (
-                  <View style={[styles.avatar, styles.avatarFallback, { backgroundColor: theme.background }]}>
-                    <Ionicons name="person" size={16} color={theme.subtext} />
-                  </View>
-                )}
-                <Text style={[styles.username, { color: theme.text }]}>
-                  @{item.username}
-                </Text>
-              </View>
-
-              {/* CONTENT */}
-              {item.content ? (
-                <Text style={[styles.content, { color: theme.text }]}>
-                  {item.content}
-                </Text>
-              ) : null}
-
-              {/* IMAGE */}
-              {item.image && (
-                <Image
-                  source={{
-                    uri: item.image.startsWith("http")
-                      ? item.image
-                      : `${API_URL}${item.image}`,
-                  }}
-                  style={styles.image}
-                  resizeMode="cover"
-                />
-              )}
-
-              {/* FOOTER ROW: like + time */}
-              <View style={styles.footer}>
-                <TouchableOpacity
-                  style={styles.likeBtn}
-                  onPress={() => handleLike(item.id, item.is_liked)}
-                  disabled={likingIds.has(item.id)}
-                  activeOpacity={0.7}
-                >
-                  <Ionicons
-                    name={item.is_liked ? "heart" : "heart-outline"}
-                    size={22}
-                    color={item.is_liked ? "#e0245e" : theme.subtext}
-                  />
-                  <Text style={[styles.likeCount, { color: item.is_liked ? "#e0245e" : theme.subtext }]}>
-                    {item.likes_count}
-                  </Text>
-                </TouchableOpacity>
-
-                <Text style={[styles.time, { color: theme.subtext }]}>
-                  {item.created_at
-                    ? new Date(item.created_at).toLocaleString()
-                    : ""}
-                </Text>
-              </View>
-            </View>
-          )}
+          renderItem={({ item }) => <PostCard item={item} theme={theme} />}
           ListEmptyComponent={
             <Text style={[styles.empty, { color: theme.text }]}>
               No posts yet. Create one!
