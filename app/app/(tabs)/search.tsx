@@ -1,24 +1,23 @@
-
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
-  View, Text, Image, FlatList, TouchableOpacity,
-  SafeAreaView, StatusBar, TextInput, useColorScheme,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+  View,
+  Text,
+  Image,
+  FlatList,
+  TouchableOpacity,
+  SafeAreaView,
+  StatusBar,
+  TextInput,
+} from "react-native";
 
-// const API_URL = "https://sda-app-backend.onrender.com";
-const API_URL = "http://127.0.0.1:8000"
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
-const lightTheme = {
-  bg: '#ffffff', card: '#ffffff', text: '#111111',
-  subtext: '#666666', border: '#efefef',
-};
-const darkTheme = {
-  bg: '#000000', card: '#111111', text: '#f1f1f1',
-  subtext: '#aaaaaa', border: '#222222',
-};
+import { useTheme } from "../../context/ThemeContext";
 
+const API_URL = "http://127.0.0.1:8000";
+
+// ─── SEARCH ITEM ───────────────────────────────────────
 function SearchItem({ item, theme, onPress }: any) {
   const avatar = item.avatar
     ? item.avatar.startsWith("http")
@@ -28,23 +27,30 @@ function SearchItem({ item, theme, onPress }: any) {
 
   return (
     <TouchableOpacity onPress={() => onPress(item)}>
-      <View style={{ flexDirection: 'row', padding: 12, alignItems: 'center' }}>
-        
+      <View
+        style={{
+          flexDirection: "row",
+          padding: 12,
+          alignItems: "center",
+        }}
+      >
         {avatar ? (
           <Image
             source={{ uri: avatar }}
             style={{ width: 40, height: 40, borderRadius: 20 }}
           />
         ) : (
-          <View style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: "#ccc",
-            justifyContent: "center",
-            alignItems: "center"
-          }}>
-            <Ionicons name="person" size={20} color="#666" />
+          <View
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              backgroundColor: theme.card,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Ionicons name="person" size={20} color={theme.subtext} />
           </View>
         )}
 
@@ -57,11 +63,12 @@ function SearchItem({ item, theme, onPress }: any) {
   );
 }
 
+// ─── MAIN SCREEN ───────────────────────────────────────
 export default function SearchScreen() {
-  const theme = useColorScheme() === 'dark' ? darkTheme : lightTheme;
+  const { theme } = useTheme(); // ✅ FIXED (GLOBAL THEME)
   const router = useRouter();
 
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
 
   const handleSearch = async (text: string) => {
@@ -73,37 +80,48 @@ export default function SearchScreen() {
     }
 
     try {
-      console.log("🔍 Searching:", text);
-
       const res = await fetch(
         `${API_URL}/search?query=${encodeURIComponent(text)}`
       );
 
       const data = await res.json();
       setResults(data);
-
     } catch (err) {
       console.log("❌ Search error:", err);
     }
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.bg }}>
-      <StatusBar barStyle="dark-content" />
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+      
+      {/* STATUS BAR */}
+      <StatusBar
+        barStyle={theme.dark ? "light-content" : "dark-content"}
+      />
 
       {/* NAVBAR */}
-      <View style={{
-        flexDirection: 'row', alignItems: 'center', padding: 10,
-        borderBottomWidth: 1, borderColor: theme.border,
-      }}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          padding: 10,
+          borderBottomWidth: 1,
+          borderColor: theme.card,
+          backgroundColor: theme.background,
+        }}
+      >
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color={theme.text} />
         </TouchableOpacity>
 
         <TextInput
           style={{
-            flex: 1, marginLeft: 10, padding: 6,
-            backgroundColor: theme.card, borderRadius: 8, color: theme.text,
+            flex: 1,
+            marginLeft: 10,
+            padding: 8,
+            backgroundColor: theme.card,
+            borderRadius: 8,
+            color: theme.text,
           }}
           placeholder="Search"
           placeholderTextColor={theme.subtext}
@@ -113,6 +131,7 @@ export default function SearchScreen() {
         />
       </View>
 
+      {/* RESULTS */}
       <FlatList
         data={results}
         keyExtractor={(item: any) => item.id}
@@ -121,11 +140,21 @@ export default function SearchScreen() {
             item={item}
             theme={theme}
             onPress={(user) => {
-              console.log("👉 Open profile:", user.id);
               router.push(`/profile/${user.id}`);
             }}
           />
         )}
+        ListEmptyComponent={
+          <Text
+            style={{
+              textAlign: "center",
+              marginTop: 50,
+              color: theme.subtext,
+            }}
+          >
+            No results found
+          </Text>
+        }
       />
     </SafeAreaView>
   );
