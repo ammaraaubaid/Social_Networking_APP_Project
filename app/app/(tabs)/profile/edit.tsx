@@ -18,7 +18,8 @@ import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 
-const API_URL = "http://127.0.0.1:8000";
+// const API_URL = "https://sda-app-backend.onrender.com";
+const API_URL = "http://127.0.0.1:8000"
 
 // ─── TOKEN DECODER ──────────────────────────────────────
 function decodeToken(token: string) {

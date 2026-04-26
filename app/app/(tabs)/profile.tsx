@@ -18,8 +18,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { decode as atob } from "base-64";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+const API_URL = "http://127.0.0.1:8000"
 
-const API_URL = "http://127.0.0.1:8000";
+// const API_URL = "https://sda-app-backend.onrender.com";
 const { width } = Dimensions.get("window");
 const TILE_SIZE = (width - 3) / 3;
 
@@ -238,6 +239,17 @@ export default function ProfileScreen({ navigation }: any) {
         </TouchableOpacity>
       </View>
 
+        {/* Create post */}
+      <View style={styles.editBtnWrapper}>
+        <TouchableOpacity
+  style={styles.fab}
+  onPress={() => router.push("/post")} // adjust if your route is different
+>
+  <Ionicons name="add" size={28} color="#fff" />
+</TouchableOpacity>
+      </View>
+      
+
       {/* Grid / Tagged tabs */}
       <View style={styles.tabsRow}>
         <TouchableOpacity style={[styles.tab, styles.tabActive]}>
@@ -306,6 +318,18 @@ const styles = StyleSheet.create({
     color: "#000",
     marginHorizontal: 4,
   },
+  fab: {
+  position: "absolute",
+  bottom: 30,
+  right: 20,
+  backgroundColor: "#000",
+  width: 60,
+  height: 60,
+  borderRadius: 30,
+  justifyContent: "center",
+  alignItems: "center",
+  elevation: 5,
+},
 
   // Avatar + Stats
   avatarStatsRow: {
