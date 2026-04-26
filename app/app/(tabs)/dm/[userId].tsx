@@ -4,7 +4,7 @@ import {
   TextInput,
   TouchableOpacity,
   Text,
-  StyleSheetgit
+  StyleSheet,
   FlatList,
   KeyboardAvoidingView,
   Platform,
