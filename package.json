@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "expo": "^55.0.19",
+    "react-router-dom": "^7.14.2"
+  },
+  "devDependencies": {
+    "expo-cli": "^6.3.12"
+  }
+}
