@@ -138,3 +138,25 @@ class AuthService:
             "refresh_token": refresh_token,
             "token_type": "bearer",
         }
+
+    def forgot_password(self, email: str) -> dict:
+        user = self.user_repo.get_by_email(email)
+        if not user:
+            raise HTTPException(status_code=404, detail="No account found with this email")
+
+        token = self.create_verification_token(email)
+        reset_link = f"http://127.0.0.1:8000/reset-password?token={token}"
+        return {"message": "Password reset link generated", "reset_link": reset_link}
+
+    def reset_password(self, token: str, new_password: str) -> dict:
+        email = self.decode_verification_token(token)
+        if not email:
+            raise HTTPException(status_code=400, detail="Invalid or expired token")
+
+        user = self.user_repo.get_by_email(email)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        user.password = self.hash_password(new_password)
+        self.user_repo.update(user)
+        return {"message": "Password reset successful"}
