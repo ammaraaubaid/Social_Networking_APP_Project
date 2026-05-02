@@ -19,7 +19,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../../context/ThemeContext";
 
 // const API_URL = "http://127.0.0.1:8000";
-const API_URL = "http://10.104.114.50:8000"
+const API_URL = "http://127.0.0.1:8000";
 
 const { width } = Dimensions.get("window");
 const TILE_SIZE = (width - 3) / 3;
@@ -271,6 +271,16 @@ export default function UserProfileScreen() {
           </TouchableOpacity>
         )}
       </View>
+      {/* ADMIN BUTTON — only visible when logged in as admin */}
+{isOwnProfile && user?.username === "admin" && (
+  <TouchableOpacity
+    onPress={() => router.push("/(tabs)/admin")}
+    style={[styles.adminBtn]}
+  >
+    <Ionicons name="shield-checkmark" size={16} color="#fff" />
+    <Text style={styles.adminBtnText}>Admin Panel</Text>
+  </TouchableOpacity>
+)}
 
       <View style={[styles.divider, { backgroundColor: theme.card }]} />
     </View>
@@ -348,4 +358,21 @@ const styles = StyleSheet.create({
   tileText: { fontSize: 10, textAlign: "center" },
   emptyPosts: { alignItems: "center", paddingTop: 60, gap: 12 },
   emptyPostsText: { fontSize: 14 },
+    // ── add these two at the end ──
+  adminBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    marginHorizontal: 18,
+    marginBottom: 10,
+    backgroundColor: "#6C63FF",
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  adminBtnText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 14,
+  },
 });
