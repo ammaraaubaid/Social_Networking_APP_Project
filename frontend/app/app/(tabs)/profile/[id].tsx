@@ -98,7 +98,7 @@ function FollowButton({
         <ActivityIndicator size="small" color={isFollowing ? theme.text : "#fff"} />
       ) : (
         <Text style={[styles.followBtnText, { color: isFollowing ? theme.text : "#fff" }]}>
-          {isFollowing ? "Following" : "Follow"}
+          {isFollowing ? "Unfollow" : "Follow"}
         </Text>
       )}
     </TouchableOpacity>

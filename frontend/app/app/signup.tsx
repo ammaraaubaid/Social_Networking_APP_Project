@@ -15,7 +15,6 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
-const [dateOfBirth,setdateOfBirth]=useState("")
 
 
   const handleSignup = async () => {
@@ -29,8 +28,7 @@ const [dateOfBirth,setdateOfBirth]=useState("")
           username,
           email,
           full_name: fullName,
-          password,
-          date_of_birth: dateOfBirth,
+          password
         }),
       });
 
@@ -43,7 +41,7 @@ const [dateOfBirth,setdateOfBirth]=useState("")
 
       alert("Account created successfully!");
 
-      // Optional: go back to login
+      
       router.replace("/");
       
     } catch (error) {

@@ -2,8 +2,9 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-nativ
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState } from "react";
 import { useRouter } from "expo-router";
+import { Stack } from "expo-router";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "http://192.168.100.22:8000";
 
 export default function HomePage() {
   const router = useRouter();
@@ -12,7 +13,7 @@ export default function HomePage() {
 
   const handleLogin = async () => {
     try {
-      console.log("🔵 Logging in...");
+      
 
       const formData = new FormData();
       formData.append("username", username);
@@ -41,17 +42,20 @@ export default function HomePage() {
       await AsyncStorage.setItem("access_token", data.access_token);
       await AsyncStorage.setItem("refresh_token", data.refresh_token);
 
-      console.log("✅ Login success");
+      
       router.replace("/profile");
 
-    } catch (error) {
-      console.log("❌ Error:", error);
+    } 
+    catch (error) {
+      console.log(" Error:", error);
       alert("Something went wrong");
     }
   };
 
   return (
     <View style={styles.container}>
+          <Stack.Screen options={{ headerShown: false }} />
+
       <Text style={styles.logo}>Unifi</Text>
 
       <TextInput
