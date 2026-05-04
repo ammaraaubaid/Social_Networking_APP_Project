@@ -2,7 +2,8 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from "reac
 import React, { useState } from "react"
 import { useRouter, useLocalSearchParams } from "expo-router"
 
-const API_URL = "http://127.0.0.1:8000"
+// const API_URL = "http://127.0.0.1:8000"
+const API_URL = "https://sda-app-backend.onrender.com";
 
 export default function ResetPasswordPage() {
   const router = useRouter()

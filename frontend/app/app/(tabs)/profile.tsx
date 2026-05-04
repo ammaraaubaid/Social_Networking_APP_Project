@@ -21,8 +21,9 @@ import { useRouter } from "expo-router";
 import { useTheme } from "../../context/ThemeContext";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
+const API_URL = "https://sda-app-backend.onrender.com";
 
-const API_URL = "http://192.168.100.22:8000";
+// const API_URL = "http://192.168.100.22:8000";
 const { width } = Dimensions.get("window");
 
 const TOKEN = {
@@ -143,7 +144,7 @@ function PostTile({ post, theme }: { post: Post; theme: any }) {
 
 
 // ─── Main Screen ──────────────────────────────────────────────────────────────
-
+//
 export default function ProfileScreen({ profileUserId }: { profileUserId?: string }) {
   const router  = useRouter();
   const { theme, mode } = useTheme();
@@ -162,8 +163,7 @@ export default function ProfileScreen({ profileUserId }: { profileUserId?: strin
 
   // Whose profile are we viewing?
   const targetUserId = profileUserId ?? loggedInUserId ?? "";
-  const isOwnProfile = !profileUserId || profileUserId === loggedInUserId;
-
+ 
   // ── Data fetching ────────────────────────────────────────────────────────
 
   const fetchData = useCallback(async () => {
@@ -176,14 +176,14 @@ export default function ProfileScreen({ profileUserId }: { profileUserId?: strin
       const myId    = payload?.sub as string;
       setLoggedInUserId(myId);
 
-      const viewId  = profileUserId ?? myId;
+
       const headers = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
 
-      const userRes  = await fetch(`${API_URL}/users/id/${viewId}`, { headers });
+      const userRes  = await fetch(`${API_URL}/users/id/${myId}`, { headers });
       const userData: User = await userRes.json();
       setUser(userData);
 
-      const postsRes = await fetch(`${API_URL}/users/${viewId}/posts`, { headers });
+      const postsRes = await fetch(`${API_URL}/users/${myId}/posts`, { headers });
       if (postsRes.ok) {
         const data = await postsRes.json();
         setPosts(Array.isArray(data) ? data : []);
@@ -237,8 +237,8 @@ export default function ProfileScreen({ profileUserId }: { profileUserId?: strin
             <Ionicons name={showDropdown ? "chevron-up" : "chevron-down"} size={12} color={theme.text + "99"} />
           </TouchableOpacity>
 
-          {/* Only show hamburger menu on own profile */}
-          {isOwnProfile && (
+          
+          { (
             <TouchableOpacity
               onPress={() => router.push("/menu")}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -286,16 +286,7 @@ export default function ProfileScreen({ profileUserId }: { profileUserId?: strin
           {user?.bio       && <Text style={[styles.bioText, { color: theme.text }]}>{user.bio}</Text>}
         </View>
 
-        {/* Follow / Unfollow — only shown when viewing someone else's profile */}
-        {!isOwnProfile && currentToken && targetUserId && (
-          <View style={styles.followBtnWrapper}>
-            <FollowButton
-              targetUserId={targetUserId}
-              token={currentToken}
-              theme={theme}
-            />
-          </View>
-        )}
+       
 
         {/* Grid section divider */}
         <View style={[styles.gridLabel, { borderColor: theme.text + "18" }]}>

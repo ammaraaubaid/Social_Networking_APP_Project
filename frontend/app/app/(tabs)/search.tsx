@@ -17,7 +17,8 @@ import { useRouter } from "expo-router";
 import { useTheme } from "../../context/ThemeContext";
 
 // const API_URL = "http://192.168.100.22:8000"
-const API_URL = "http://192.168.100.22:8000";
+// const API_URL = "http://192.168.100.22:8000";
+const API_URL = "https://sda-app-backend.onrender.com";
 
 // ─── SEARCH ITEM ───────────────────────────────────────
 function SearchItem({ item, theme, onPress }: any) {

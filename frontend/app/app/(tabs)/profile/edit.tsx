@@ -20,7 +20,7 @@ import { useRouter } from "expo-router";
 import { useTheme } from "../../../context/ThemeContext";
 
 // const API_URL = "http://127.0.0.1:8000";
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "https://sda-app-backend.onrender.com";
 
 function decodeToken(token: string) {
   try {
@@ -69,6 +69,8 @@ function FieldRow({
     </View>
   );
 }
+
+
 
 export default function EditProfileScreen() {
   const router = useRouter();
@@ -194,7 +196,7 @@ export default function EditProfileScreen() {
 
       router.replace("/(tabs)/profile");
     } catch (err) {
-      console.log("❌ Save error:", err);
+      console.log(" Save error:", err);
       Alert.alert("Error", "Something went wrong.");
     } finally {
       setSaving(false);

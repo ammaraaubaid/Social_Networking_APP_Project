@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "expo-router";
 import { Stack } from "expo-router";
 
-const API_URL = "http://192.168.100.22:8000";
+const API_URL = "https://sda-app-backend.onrender.com";
 
 export default function HomePage() {
   const router = useRouter();

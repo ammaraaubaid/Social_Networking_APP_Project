@@ -18,8 +18,12 @@ from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useTheme } from "../../context/ThemeContext";
-const BASE_URL = "http://192.168.100.22:8000";
+// const BASE_URL = "http://192.168.100.22:8000";
 
+
+//sda-app-backend.onrender.com";
+
+const BASE_URL = "https://sda-app-backend.onrender.com";
 
 interface ChatUser {
   user_id: string;
@@ -476,7 +480,7 @@ export default function MessagesScreen() {
               />
             ) : chats.length === 0 ? (
               <View style={styles.emptyState}>
-                <Text style={styles.emptyEmoji}>💬</Text>
+                <Text style={styles.emptyEmoji}></Text>
                 <Text style={[styles.emptyTitle, { color: theme.text }]}>
                   No recent chats
                 </Text>

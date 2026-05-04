@@ -8,7 +8,7 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme } from "../../context/ThemeContext";
 import { decode as atob } from "base-64";
-const API_URL = "http://192.168.100.22:8000";
+const API_URL = "https://sda-app-backend.onrender.com";
 
 // ─── SHARE MODAL ───────────────────────────────────────
 function ShareModal({
