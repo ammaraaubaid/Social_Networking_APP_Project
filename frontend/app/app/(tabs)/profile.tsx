@@ -50,7 +50,8 @@ type Post = {
 type User = {
   id: string;
   username: string;
-  email?: string;
+
+  email?: string; 
   full_name?: string;
   bio?: string;
   profile_pic?: string;

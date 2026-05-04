@@ -24,7 +24,8 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { decode as atob } from "base-64";
 
-const API_URL = "http://127.0.0.1:8000";
+// const API_URL = "http://127.0.0.1:8000";
+const API_URL = "https://sda-app-backend.onrender.com";
 
 const EMOJI_LIST = [
   "😀","😂","🥰","😍","🤩","😎","🥳","😭","😤","🤔",

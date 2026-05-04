@@ -68,7 +68,7 @@ function SearchItem({ item, theme, onPress }: any) {
 
 // ─── MAIN SCREEN ───────────────────────────────────────
 export default function SearchScreen() {
-  const { theme } = useTheme(); // ✅ FIXED (GLOBAL THEME)
+  const { theme } = useTheme(); 
   const router = useRouter();
 
   const [query, setQuery] = useState("");

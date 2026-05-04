@@ -17,7 +17,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
-const API_URL = "http://127.0.0.1:8000";
+// const API_URL = "http://127.0.0.1:8000";
+const API_URL = "https://sda-app-backend.onrender.com";
 
 // const API_URL = "http://127.0.0.1:8000";
 
@@ -110,7 +111,7 @@ export default function EditPostScreen() {
         return;
       }
 
-      // ✅ go directly to profile instead of back()
+      
       router.replace("/(tabs)/profile");
     } catch (e) {
       console.error("❌ Edit error:", e);
@@ -153,13 +154,13 @@ export default function EditPostScreen() {
   };
 
   if (Platform.OS === "web") {
-    // ✅ window.confirm works on web
+    
     const confirmed = window.confirm(
       "Are you sure you want to delete this post? This cannot be undone."
     );
     if (confirmed) doDelete();
   } else {
-    // ✅ Alert.alert works on mobile
+    
     Alert.alert(
       "Delete Post",
       "Are you sure you want to delete this post? This cannot be undone.",

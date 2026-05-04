@@ -12,7 +12,7 @@ export default function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [loading, setLoading] = useState(false)
 
-  // ✅ decode token to handle special characters from URL
+  
   const cleanToken = decodeURIComponent(token as string)
   console.log("🟣 Token on reset page:", cleanToken)
   console.log("🟣 Token length:", cleanToken?.length)
@@ -37,7 +37,7 @@ export default function ResetPasswordPage() {
       console.log("🔵 Sending reset request...")
 
       const formData = new FormData()
-      formData.append("token", cleanToken)   // ✅ use decoded token
+      formData.append("token", cleanToken)   
       formData.append("new_password", newPassword)
 
       const response = await fetch(`${API_URL}/reset-password`, {
@@ -63,8 +63,10 @@ export default function ResetPasswordPage() {
       }
 
       Alert.alert("✅ Success", "Password reset successfully! Please log in.", [
-        { text: "OK", onPress: () => router.replace("/index") }
-      ])
+
+  { text: "OK", onPress: () => router.replace("/") }
+])
+      
 
     } catch (error) {
       console.log("❌ Error:", error)
@@ -99,7 +101,7 @@ export default function ResetPasswordPage() {
         <Text style={styles.buttonText}>{loading ? "Resetting..." : "Reset Password"}</Text>
       </TouchableOpacity>
 
-      <Text style={styles.back} onPress={() => router.replace("/(tabs)")}>← Back to Login</Text>
+      <Text style={styles.back} onPress={() => router.replace("/")}>← Back to Login</Text>
     </View>
   )
 }
